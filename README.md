@@ -9,6 +9,7 @@ The black rectangle on the bottom acts as a map for the arc on the top. The arc 
 
 Screenshot
 ===
+![Screenshot of Assignment 1](Screenshot2026-01-23000259.png)
 
 Link to hosted file
 ===
