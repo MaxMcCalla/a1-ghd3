@@ -1,12 +1,113 @@
 <!DOCTYPE html>
 <div id="container"></div>
+<div id="brush"></div>
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script type="module">
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
   console.log(d3); // test if d3 is loaded
   // Add an SVG
+  var width = 1000;
+  var height = 800;
+  var svg = d3.select("#container")
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
   // Add Rectangles
-  // Add Circles
+  svg.append("rect")
+    .attr("x",100)
+    .attr("y",500)
+    .attr("width",400)
+    .attr("height",100)
+    .attr("fill","#004000")
+
+
   // Add Lines
+  svg.append("line")
+  .attr("x1", 50)
+  .attr("y1", 100)
+  .attr("x2", 550)
+  .attr("y2", 100)
+  .attr("stroke","black")
+  .attr("stroke-width",10)
   // Add Polygons
+  function hexX(vertex){
+    return (Math.sin(vertex*Math.PI/3) * 150) + 300
+  }
+
+  function hexY(vertex){
+    return (Math.cos(vertex*Math.PI/3) * 150) + 300
+  }
+
+  var hull = d3.polygonHull([[hexX(0),hexY(0)],[hexX(1),hexY(1)],[hexX(2),hexY(2)],[hexX(3),hexY(3)],[hexX(4),hexY(4)],[hexX(5),hexY(5)]])
+  var line = d3.line()
+    .curve(d3.curveLinearClosed)
+  svg.append("path")
+  .attr("d", line(hull))
+  .attr("fill","green")
+
+  // Add Circles
+  svg.append("circle")
+  .attr("r",25)
+  .attr("cx",300)
+  .attr("cy",300)
+  .attr("fill","#12b333")
+
+  // Arcs
+  const color1 = d3.scaleLinear([-Math.PI * 3/4,Math.PI * 3/4],['Red','blue'])
+  
+      const arc1 = d3.arc()
+      .innerRadius(50)
+      .outerRadius(100)
+      .startAngle(-Math.PI * 3/4)
+      .endAngle(Math.PI * 3/4)
+
+      const a1 = svg.append("path")
+      .attr("transform","translate(300,300)")
+      .attr("d", arc1)
+      .attr("fill","white");
+
+      var arc2 = d3.arc()
+      .innerRadius(50)
+      .outerRadius(100)
+      .startAngle(0)
+      .endAngle(0);
+      const a2 = svg.append("path")
+      .attr("transform","translate(300,300)")
+      .attr("d", arc2)
+      .attr("fill","#40EE40");
+      console.log(arc2.startAngle());
+
+
+
+  const brush = d3.brushX()
+  .extent([[100,500], [500,600]])
+  .on("brush", brushed)
+  .on("end",unbrushed)
+
+  const gb = svg.append("g")
+      .call(brush)
+      .call(brush.move, defaultSelection);
+
+    function brushed({selection}) {
+    if (selection) {
+      const [x0, x1] = selection;
+      arc2 = d3.arc()
+      .innerRadius(50)
+      .outerRadius(100)
+      .startAngle((x0-300)/200*(Math.PI * 3/4))
+      .endAngle(((x1-300)/200*(Math.PI * 3/4)));
+      a2.attr("d",arc2);
+    }
+  }
+  function unbrushed({selection}) {
+      if(!selection){
+      arc2 = d3.arc()
+      .innerRadius(50)
+      .outerRadius(100)
+      .startAngle(0)
+      .endAngle(0);
+      a2.attr("d",arc2);
+    }
+  }
 </script>
